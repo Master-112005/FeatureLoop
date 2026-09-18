@@ -59,7 +59,7 @@ export default function App() {
           open={newRequestOpen}
           onOpenChange={setNewRequestOpen}
           onCreated={(item) => {
-            window.location.href = `/requests/${item.id}`;
+            window.location.assign(`/requests/${item.id}`);
           }}
         />
       </div>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { MessageSquareIcon } from 'lucide-react';
 import { CommentItem } from '@/components/comments/CommentItem';
 import { CommentInput } from '@/components/comments/CommentInput';
@@ -27,26 +27,43 @@ export function CommentThread({
   onRequestUpdated,
   compact = false,
 }) {
-  const { user, openAuthGate } = useAuth();
+const { user, openAuthGate } = useAuth();
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
+  const commentsViewportRef = useRef(null);
   const thread = useMemo(() => buildThread(comments), [comments]);
+
+  const showLatestComment = () => {
+    requestAnimationFrame(() => {
+      const viewport = commentsViewportRef.current;
+      if (viewport) viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'smooth' });
+    });
+  };
+
+  useEffect(() => {
+    if (!compact || !commentsViewportRef.current) return;
+    const viewport = commentsViewportRef.current;
+    viewport.scrollTop = viewport.scrollHeight;
+  }, [comments, compact]);
 
   const handleAdd = async (content, parentComment = null) => {
     if (!user) {
       openAuthGate();
-      return;
+      return false;
     }
     setSubmitting(true);
     try {
       const { data } = await api.post(`/requests/${requestId}/comments`, {
-        content,
-        parentComment,
+        content: content.trim(),
+        ...(parentComment ? { parentComment } : {}),
       });
       setComments((prev) => [...prev, data.item]);
+      showLatestComment();
       onRequestUpdated?.();
+      return true;
     } catch (err) {
       toast.error('Could not post comment', formatError(err));
+      return false;
     } finally {
       setSubmitting(false);
     }
@@ -73,7 +90,10 @@ export function CommentThread({
           </span>
         </div>
 
-        <div className="mt-2 min-h-0 flex-1 overflow-hidden">
+        <div
+          ref={commentsViewportRef}
+          className="mt-2 min-h-0 flex-1 overflow-y-auto overscroll-contain pe-1"
+        >
           {thread.length === 0 ? (
             <p className="mt-6 text-center text-sm text-muted-foreground">No comments yet.</p>
           ) : (

@@ -6,7 +6,6 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Access token lives in memory only — it is never persisted.
 let currentAccessToken = null;
 
 export function setAccessToken(token) {
@@ -19,7 +18,8 @@ export function getAccessToken() {
 
 api.interceptors.request.use((config) => {
   if (currentAccessToken) {
-    config.headers.Authorization = `Bearer ${currentAccessToken}`;
+    config.headers = config.headers || {};
+    config.headers.Authorization = 'Bearer ' + currentAccessToken;
   }
   return config;
 });
@@ -43,7 +43,8 @@ api.interceptors.response.use(
         }
         const { data } = await refreshPromise;
         setAccessToken(data.accessToken);
-        original.headers.Authorization = `Bearer ${data.accessToken}`;
+        original.headers = original.headers || {};
+        original.headers.Authorization = 'Bearer ' + data.accessToken;
         return api(original);
       } catch (refreshError) {
         setAccessToken(null);

@@ -43,7 +43,7 @@ export function NewRequestModal({ open, onOpenChange, onCreated }) {
         description: form.description.trim(),
         category: form.category,
       });
-      onCreated?.(data.request);
+      onCreated?.(data.item);
       onOpenChange(false);
     } catch (err) {
       setError(formatError(err));

@@ -171,39 +171,41 @@ export function Timeline({ columns }) {
         </div>
       </div>
 
-      <div className="mt-6 grid items-start gap-4 md:grid-cols-3">
-        {ROADMAP_COLUMNS.map((status) => {
-          const items = columns[status] || [];
-          return (
-            <section key={status} className="flex flex-col gap-3">
-              <header className="flex items-center gap-2">
-                <span className={cn('size-2 rounded-full', COLUMN_DOT[status])} />
-                <h2 className="font-semibold">{status}</h2>
-                <span className="ms-auto rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                  {items.length}
-                </span>
-              </header>
-              <div className="flex flex-col gap-3">
-                {items.length === 0 ? (
-                  <div className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
-                    Nothing here yet.
-                  </div>
-                ) : (
-                  items.map((item) => (
-                    <div key={item.id} ref={(el) => (cardRefs.current[item.id] = el)}>
-                      <FeatureCard
-                        item={item}
-                        color={colorFor(item.id)}
-                        blinking={blinkId === item.id}
-                        onBlink={() => handlePick(item)}
-                      />
+      <div className="mt-6 overflow-x-auto pb-3 overscroll-x-contain">
+        <div className="flex min-w-full w-max items-start gap-4">
+          {ROADMAP_COLUMNS.map((status) => {
+            const items = columns[status] || [];
+            return (
+              <section key={status} className="flex w-[min(82vw,22rem)] shrink-0 flex-col gap-3">
+                <header className="flex items-center gap-2">
+                  <span className={cn('size-2 rounded-full', COLUMN_DOT[status])} />
+                  <h2 className="font-semibold">{status}</h2>
+                  <span className="ms-auto rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                    {items.length}
+                  </span>
+                </header>
+                <div className="flex flex-col gap-3">
+                  {items.length === 0 ? (
+                    <div className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+                      Nothing here yet.
                     </div>
-                  ))
-                )}
-              </div>
-            </section>
-          );
-        })}
+                  ) : (
+                    items.map((item) => (
+                      <div key={item.id} ref={(el) => (cardRefs.current[item.id] = el)}>
+                        <FeatureCard
+                          item={item}
+                          color={colorFor(item.id)}
+                          blinking={blinkId === item.id}
+                          onBlink={() => handlePick(item)}
+                        />
+                      </div>
+                    ))
+                  )}
+                </div>
+              </section>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

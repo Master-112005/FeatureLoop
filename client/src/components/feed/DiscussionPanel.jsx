@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { MessagesSquareIcon, XIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -16,6 +16,12 @@ export function DiscussionPanel({ id, open, onClose, onCommentsChange }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const loadComments = useCallback(async () => {
+    const { data } = await api.get(`/requests/${id}/comments`);
+    setComments(data.items);
+    return data.items;
+  }, [id]);
+
   useEffect(() => {
     if (!open) return undefined;
     let active = true;
@@ -23,8 +29,7 @@ export function DiscussionPanel({ id, open, onClose, onCommentsChange }) {
     setError('');
     (async () => {
       try {
-        const { data } = await api.get(`/requests/${id}/comments`);
-        if (active) setComments(data.items);
+        if (active) await loadComments();
       } catch (err) {
         if (active) setError(formatError(err));
       } finally {
@@ -39,14 +44,14 @@ export function DiscussionPanel({ id, open, onClose, onCommentsChange }) {
       active = false;
       window.removeEventListener('keydown', onKey);
     };
-  }, [open, id, onClose]);
+  }, [open, loadComments, onClose]);
 
   return (
     <aside
       className={cn(
-        'fixed z-30 flex w-full flex-col bg-background shadow-2xl',
-        'inset-x-0 bottom-0 max-h-[80dvh] rounded-t-2xl border-t',
-        'sm:inset-x-auto sm:bottom-auto sm:left-auto sm:right-40 sm:top-[58%] sm:h-[480px] sm:w-[480px] sm:-translate-y-1/2 sm:rounded-2xl sm:border sm:shadow-xl/10 sm:transition-all sm:duration-300 sm:ease-out',
+        'fixed z-50 pointer-events-auto flex w-full flex-col bg-background shadow-2xl',
+        'inset-x-0 bottom-0 h-[80dvh] rounded-t-2xl border-t',
+        'sm:inset-x-auto sm:bottom-auto sm:left-auto sm:right-40 sm:top-[58%] sm:h-[420px] sm:w-[400px] sm:-translate-y-1/2 sm:rounded-2xl sm:border sm:shadow-xl/10 sm:transition-all sm:duration-300 sm:ease-out',
         open
           ? 'visible opacity-100 sm:translate-x-0'
           : 'pointer-events-none invisible opacity-0 sm:translate-x-[calc(100%+2rem)]'
@@ -83,7 +88,12 @@ export function DiscussionPanel({ id, open, onClose, onCommentsChange }) {
             compact
             requestId={id}
             comments={comments}
-            setComments={setComments}
+            setComments={async (update) => {
+              setComments((current) => (typeof update === 'function' ? update(current) : update));
+              if (typeof update === 'function') {
+                await loadComments();
+              }
+            }}
             onRequestUpdated={() => onCommentsChange?.(id)}
           />
         )}

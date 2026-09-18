@@ -16,16 +16,16 @@ export function CommentInput({
 
   const canSubmit = content.trim().length > 0 && !submitting;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!canSubmit) return;
-    onSubmit(content.trim());
+    await onSubmit(content.trim());
     setContent('');
   };
 
   if (compact) {
     return (
-      <form onSubmit={handleSubmit} className="relative">
+      <form onSubmit={handleSubmit} onClick={(e) => e.stopPropagation()} className="relative">
         <Textarea
           rows={1}
           placeholder={placeholder}
@@ -51,7 +51,7 @@ export function CommentInput({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col items-end gap-2">
+    <form onSubmit={handleSubmit} onClick={(e) => e.stopPropagation()} className="flex flex-col items-end gap-2">
       <Textarea
         rows={2}
         placeholder={placeholder}

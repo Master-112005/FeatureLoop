@@ -13,7 +13,7 @@ export function CommentItem({ comment, isReply = false, compact = false, onReply
   const [replying, setReplying] = useState(false);
 
   const authorId = comment.author?.id || comment.author?._id;
-  const canModerate = user && (isAdmin || user.id === authorId);
+  const canModerate = user && (isAdmin || String(user.id) === String(authorId));
 
   const handleReply = async (content) => {
     if (!onReply) return;
