@@ -30,6 +30,10 @@ export const SORTS = [
 
 export const ROADMAP_COLUMNS = ['Planned', 'In Progress', 'Completed'];
 
+// The admin board also needs the intake lane so requests are never hidden
+// before an administrator moves them onto the public roadmap.
+export const ADMIN_COLUMNS = STATUS_FLOW;
+
 export function badgeVariantForCategory(category) {
   const found = CATEGORIES.find((c) => c.value === category);
   return found ? found.badge : 'outline';

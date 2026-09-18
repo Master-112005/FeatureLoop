@@ -11,8 +11,14 @@ export function CommentInput({
   compact = false,
   placeholder = 'Add to the discussion…',
   submitLabel = 'Comment',
+  value,
+  onChange,
 }) {
-  const [content, setContent] = useState('');
+  const [internalContent, setInternalContent] = useState('');
+  const isControlled = value !== undefined;
+
+  const content = isControlled ? value : internalContent;
+  const setContent = isControlled ? onChange : setInternalContent;
 
   const canSubmit = content.trim().length > 0 && !submitting;
 
@@ -20,7 +26,7 @@ export function CommentInput({
     e.preventDefault();
     if (!canSubmit) return;
     await onSubmit(content.trim());
-    setContent('');
+    if (!isControlled) setContent('');
   };
 
   if (compact) {

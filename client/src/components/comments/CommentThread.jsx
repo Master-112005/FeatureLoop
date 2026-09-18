@@ -80,6 +80,12 @@ const { user, openAuthGate } = useAuth();
     }
   };
 
+  const handleUpdate = async (commentId, content) => {
+    const { data } = await api.patch(`/comments/${commentId}`, { content });
+    setComments((prev) => prev.map((c) => (c.id === data.item.id ? data.item : c)));
+    onRequestUpdated?.();
+  };
+
   if (compact) {
     return (
       <div className="flex h-full min-h-0 flex-1 flex-col">
@@ -106,6 +112,7 @@ const { user, openAuthGate } = useAuth();
                     compact
                     onReply={(content, parent) => handleAdd(content, parent.id)}
                     onDelete={handleDelete}
+                    onUpdate={handleUpdate}
                   />
                 ))}
               </div>
@@ -149,6 +156,7 @@ const { user, openAuthGate } = useAuth();
               comment={comment}
               onReply={(content, parent) => handleAdd(content, parent.id)}
               onDelete={handleDelete}
+              onUpdate={handleUpdate}
             />
           ))}
         </div>

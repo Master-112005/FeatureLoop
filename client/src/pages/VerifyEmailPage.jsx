@@ -13,6 +13,13 @@ export function VerifyEmailPage() {
 
   useEffect(() => {
     let active = true;
+    if (!token) {
+      setState({ status: 'error', message: 'This verification link is missing its token.' });
+      return () => {
+        active = false;
+      };
+    }
+
     (async () => {
       try {
         const { data } = await api.get(`/auth/verify/${token}`);

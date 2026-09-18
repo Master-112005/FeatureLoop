@@ -6,12 +6,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
-import { ROADMAP_COLUMNS, badgeVariantForCategory } from '@/lib/constants';
+import { ADMIN_COLUMNS, badgeVariantForCategory } from '@/lib/constants';
 import { formatError } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import api from '@/api/axiosInstance';
 
 const COLUMN_DOT = {
+  'Under Review': 'bg-zinc-400',
   Planned: 'bg-sky-500',
   'In Progress': 'bg-amber-500',
   Completed: 'bg-emerald-500',
@@ -140,7 +141,7 @@ export function AdminDashboardPage() {
 
   const columns = useMemo(
     () =>
-      ROADMAP_COLUMNS.map((status) => ({
+      ADMIN_COLUMNS.map((status) => ({
         status,
         items: items.filter((it) => it.status === status),
       })),
@@ -188,7 +189,7 @@ export function AdminDashboardPage() {
       ) : error ? (
         <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive">{error}</div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           {columns.map(({ status, items: colItems }) => (
             <div
               key={status}
