@@ -10,14 +10,23 @@ const {
   clearRefreshCookieOptions,
 } = require('../utils/generateTokens');
 const {
-  sendEmailMock,
-  buildVerifyLink,
   buildResetLink,
 } = require('../utils/sendEmail.mock');
 
 exports.signup = async (req, res, next) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, adminPassword } = req.body;
+
+    if (
+      !env.adminSignupPassword ||
+      adminPassword.length !== env.adminSignupPassword.length ||
+      !crypto.timingSafeEqual(Buffer.from(adminPassword), Buffer.from(env.adminSignupPassword))
+    ) {
+      return res.status(403).json({
+        error: 'Invalid admin authorization password',
+        code: 'INVALID_ADMIN_PASSWORD',
+      });
+    }
 
     const existing = await User.exists({
       $or: [{ username }, { email: String(email).toLowerCase() }],
@@ -28,31 +37,16 @@ exports.signup = async (req, res, next) => {
         .json({ error: 'That username or email is already registered', code: 'USER_EXISTS' });
     }
 
-    const verificationToken = crypto.randomBytes(32).toString('hex');
     const user = await User.create({
       username,
       email,
       passwordHash: password,
-      verificationToken,
-    });
-
-    await sendEmailMock({
-      to: user.email,
-      subject: 'Verify your email — FeatureLoop',
-      text: [
-        `Hi ${user.username},`,
-        '',
-        'Verify your email to finish creating your account:',
-        '',
-        buildVerifyLink(verificationToken),
-        '',
-        'If you didn’t create a FeatureLoop account, you can safely ignore this email.',
-        '',
-      ].join('\n'),
+      isVerified: true,
+      verificationToken: null,
     });
 
     return res.status(201).json({
-      message: 'Account created. Check the server console for the mock verification email.',
+      message: 'Account created and verified by the administrator.',
       user: user.toPublic(),
     });
   } catch (err) {

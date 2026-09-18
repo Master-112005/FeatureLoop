@@ -19,6 +19,10 @@ router.post(
     body('password')
       .isLength({ min: 8, max: 72 })
       .withMessage('Password must be 8–72 characters'),
+    body('adminPassword')
+      .isString()
+      .notEmpty()
+      .withMessage('Admin authorization password is required'),
   ],
   validateRequest,
   auth.signup

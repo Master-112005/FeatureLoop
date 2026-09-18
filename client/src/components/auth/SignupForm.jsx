@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertCircleIcon, InfoIcon } from 'lucide-react';
+import { AlertCircleIcon, ShieldCheckIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Field, FieldLabel, FieldError, FieldDescription } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,13 @@ import { formatError } from '@/lib/format';
 export function SignupForm({ onSuccess }) {
   const { login } = useAuth();
   const { toast } = useToast();
-  const [form, setForm] = useState({ username: '', email: '', password: '', confirm: '' });
+  const [form, setForm] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirm: '',
+    adminPassword: '',
+  });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -19,7 +25,14 @@ export function SignupForm({ onSuccess }) {
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim());
   const passwordValid = form.password.length >= 8;
   const confirmValid = form.password === form.confirm && form.confirm.length > 0;
-  const canSubmit = usernameValid && emailValid && passwordValid && confirmValid && !submitting;
+  const adminPasswordValid = form.adminPassword.length > 0;
+  const canSubmit =
+    usernameValid &&
+    emailValid &&
+    passwordValid &&
+    confirmValid &&
+    adminPasswordValid &&
+    !submitting;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,8 +44,9 @@ export function SignupForm({ onSuccess }) {
         username: form.username.trim(),
         email: form.email.trim(),
         password: form.password,
+        adminPassword: form.adminPassword,
       });
-      toast.info('Account created', 'We sent a verification email (check the server console). You can log in while it is pending.');
+      toast.success('Account created', 'Your account has been verified by the administrator.');
       await login(form.email.trim(), form.password);
       onSuccess?.();
     } catch (err) {
@@ -105,10 +119,22 @@ export function SignupForm({ onSuccess }) {
         </p>
       ) : null}
 
-      <p className="flex items-start gap-2 rounded-lg border border-border/60 bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-        <InfoIcon className="mt-0.5 size-4 shrink-0" />
-        Signing up emails a verification link to the server console (demo mock). You can sign in before verifying.
-      </p>
+      <Field>
+        <FieldLabel>Admin authorization password</FieldLabel>
+        <Input
+          name="adminPassword"
+          type="password"
+          autoComplete="off"
+          placeholder="Enter the password provided by the administrator"
+          value={form.adminPassword}
+          onChange={(e) => setForm((f) => ({ ...f, adminPassword: e.target.value }))}
+          required
+        />
+        <FieldDescription className="flex items-start gap-1.5">
+          <ShieldCheckIcon className="mt-0.5 size-4 shrink-0" />
+          Required to create an account. No email verification is needed.
+        </FieldDescription>
+      </Field>
 
       <Button type="submit" loading={submitting} disabled={!canSubmit}>
         Create account
