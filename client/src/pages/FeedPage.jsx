@@ -103,13 +103,13 @@ useEffect(() => {
   const closePanel = useCallback(() => setSelected(null), []);
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:py-8">
-      <div
-        className={cn(
-          'grid gap-0 sm:gap-3 sm:transition-[grid-template-columns] sm:duration-300 sm:ease-out',
-          panelOpen ? 'sm:grid-cols-[minmax(0,1fr)_340px]' : 'sm:grid-cols-[minmax(0,1fr)_0px]'
-        )}
-      >
+    <div
+      className={cn(
+        'mx-auto w-full max-w-4xl px-4 py-6 transition-[padding] duration-300 ease-out sm:py-8',
+        panelOpen ? 'sm:pr-[456px]' : 'sm:pr-4'
+      )}
+    >
+      <div className="mt-6 flex flex-col items-center">
         <section className="flex min-w-0 flex-col items-center">
           <div className="flex flex-col items-center gap-4 sm:hidden">
             <SearchBar value={query} onSearch={onQueryChange} />
@@ -162,14 +162,14 @@ useEffect(() => {
             </>
           )}
         </section>
-
-        <DiscussionPanel
-          id={selected?.id}
-          open={panelOpen}
-          onClose={closePanel}
-          onCommentsChange={refreshItem}
-        />
       </div>
+
+      <DiscussionPanel
+        id={selected?.id}
+        open={panelOpen}
+        onClose={closePanel}
+        onCommentsChange={refreshItem}
+      />
 
       <Button
         type="button"

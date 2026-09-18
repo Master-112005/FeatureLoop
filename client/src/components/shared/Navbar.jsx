@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { LogOutIcon, PlusIcon, ShieldIcon, SparklesIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Menu, MenuItem, MenuTrigger, MenuPopup } from '@/components/ui/menu';
@@ -18,6 +18,9 @@ const NAV_LINKS = [
 export function Navbar({ onNewRequest, query, onSearch, category, onCategoryChange, sort, onSortChange }) {
   const { user, isAdmin, loading, logout, openAuthGate } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+  const hideFeedControls = isAdminRoute || location.pathname.startsWith('/roadmap');
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleNewRequest = () => {
@@ -130,12 +133,14 @@ export function Navbar({ onNewRequest, query, onSearch, category, onCategoryChan
         </div>
       </div>
 
-      <div className="border-t">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-2 px-4 py-2">
-          <SortTabs sort={sort} onSortChange={onSortChange} />
-          <CategoryBar category={category} onCategoryChange={onCategoryChange} />
+      {!hideFeedControls ? (
+        <div className="border-t">
+          <div className="mx-auto flex max-w-5xl flex-col items-center gap-2 px-4 py-2">
+            <SortTabs sort={sort} onSortChange={onSortChange} />
+            <CategoryBar category={category} onCategoryChange={onCategoryChange} />
+          </div>
         </div>
-      </div>
+      ) : null}
     </header>
   );
 }

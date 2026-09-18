@@ -8,8 +8,8 @@ import { formatError } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 /**
- * Discussion-only window on the right side of the feed. The post's details
- * live inside the card; this pane carries just the comment thread.
+ * Floating 380px square discussion on the right side of the feed.
+ * Slides in/out; on small screens it becomes a bottom sheet.
  */
 export function DiscussionPanel({ id, open, onClose, onCommentsChange }) {
   const [comments, setComments] = useState([]);
@@ -44,10 +44,12 @@ export function DiscussionPanel({ id, open, onClose, onCommentsChange }) {
   return (
     <aside
       className={cn(
-        'w-full flex-col rounded-t-2xl border-t bg-background shadow-2xl',
-        open ? 'fixed inset-x-0 bottom-0 z-50 flex max-h-[92dvh]' : 'hidden sm:flex',
-        'sm:sticky sm:top-20 sm:z-auto sm:max-h-[calc(100dvh-7rem)] sm:min-w-0 sm:overflow-hidden sm:rounded-2xl sm:border sm:shadow-xl/10 sm:transition-opacity sm:duration-300 sm:ease-out',
-        open ? 'sm:opacity-100' : 'sm:pointer-events-none sm:opacity-0'
+        'fixed z-30 flex w-full flex-col bg-background shadow-2xl',
+        'inset-x-0 bottom-0 max-h-[80dvh] rounded-t-2xl border-t',
+        'sm:inset-x-auto sm:bottom-auto sm:left-auto sm:right-40 sm:top-[58%] sm:h-[480px] sm:w-[480px] sm:-translate-y-1/2 sm:rounded-2xl sm:border sm:shadow-xl/10 sm:transition-all sm:duration-300 sm:ease-out',
+        open
+          ? 'visible opacity-100 sm:translate-x-0'
+          : 'pointer-events-none invisible opacity-0 sm:translate-x-[calc(100%+2rem)]'
       )}
     >
       <header className="flex h-12 shrink-0 items-center justify-between border-b px-4">
@@ -66,15 +68,13 @@ export function DiscussionPanel({ id, open, onClose, onCommentsChange }) {
         </Button>
       </header>
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-4 sm:p-4">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-4">
         {loading ? (
           <div className="flex flex-col gap-3">
             <Skeleton className="size-10 rounded-full" />
             <Skeleton className="h-3.5 w-full" />
             <Skeleton className="h-3.5 w-5/6" />
             <Skeleton className="h-3.5 w-2/3" />
-            <Skeleton className="size-10 rounded-full" />
-            <Skeleton className="h-3.5 w-4/5" />
           </div>
         ) : error ? (
           <p className="text-sm text-destructive">{error}</p>

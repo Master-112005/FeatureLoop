@@ -73,7 +73,7 @@ export function CommentThread({
           </span>
         </div>
 
-        <div className="mt-2 min-h-0 flex-1 overflow-y-auto">
+        <div className="mt-2 min-h-0 flex-1 overflow-hidden">
           {thread.length === 0 ? (
             <p className="mt-6 text-center text-sm text-muted-foreground">No comments yet.</p>
           ) : (

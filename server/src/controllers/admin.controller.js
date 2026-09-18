@@ -60,7 +60,8 @@ exports.adminList = async (req, res, next) => {
  * Enforces the allowed transition sequence:
  *   Under Review → Planned → In Progress → Completed
  * A request may only move forward exactly one step at a time.
- * Setting `force: true` bypasses the restriction for admins.
+ * Setting `force: true` lets an admin skip steps or move backward (it bypasses
+ * the sequence restriction entirely).
  */
 exports.updateStatus = async (req, res, next) => {
   try {
@@ -85,11 +86,10 @@ exports.updateStatus = async (req, res, next) => {
     const toIdx = STATUS_FLOW.indexOf(target);
 
     const isValidStep = toIdx === fromIdx + 1;
-    const isForward = toIdx > fromIdx;
 
-    if (item.status !== target && !((isValidStep) || (force && isForward))) {
+    if (item.status !== target && !(isValidStep || force)) {
       return res.status(409).json({
-        error: `Cannot move "${item.status}" → "${target}". Allowed: exactly one step forward (use force for an override).`,
+        error: `Cannot move "${item.status}" → "${target}". Allowed: exactly one step forward, or use force for an override.`,
         code: 'INVALID_TRANSITION',
         from: item.status,
         to: target,

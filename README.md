@@ -3,7 +3,8 @@
 A MERN-stack **Feature Request & Public Roadmap Portal** with an Instagram-inspired feed UX.
 Users submit ideas, upvote (arrow, not heart), comment in threads, and watch requests move
 through a public roadmap lanes (Planned → In Progress → Completed). Admins moderate requests
-and enforce a strict one-step-forward status flow.
+and keep the normal status flow to one step forward, while using an explicit force override for
+skip or rollback moves.
 
 Built on the [coss.com/ui](https://coss.com/ui) shadcn-style component library
 (Tailwind v4 + Base UI). All UI primitives are consumed from `client/src/components/ui/`.
